@@ -1,0 +1,22 @@
+[
+    {
+        "id": "1",
+        "title": "producto1",
+        "description": "este es el producto1",
+        "code": "P001",
+        "price": "100",
+        "status": "avilable",
+        "stock": "50",
+        "category": "electronica"
+    },
+    {
+        "id": "2",
+        "title": "producto2",
+        "description": "este es el producto2",
+        "code": "P002",
+        "price": "200",
+        "status": "avilable",
+        "stock": "20",
+        "category": "hogar"
+    }
+]
