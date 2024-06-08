@@ -4,6 +4,7 @@ import productRouter from "./routers/product.routes.js"
 import cartRouter from "./routers/cart.routes.js"
 
 
+
 const server = express();
 const PORT = 8080;
 const HOST = "localhost";
