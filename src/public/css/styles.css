@@ -1,0 +1,122 @@
+/* Contenedor Principal */
+.contenedor {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Títulos */
+.titulo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.titulo-principal {
+  font-size: 2em;
+  color: #333;
+}
+
+/* Formulario */
+.ingresoProductos {
+  margin-bottom: 40px;
+}
+
+.ingresoProductos__contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.contenedor__file,
+.contenedor__texto {
+  flex: 1 1 45%;
+}
+
+.contenedor__file input,
+.contenedor__texto input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+/* Botones del Formulario */
+.contenedor__button {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.limpiar {
+  background-color: #f44336;
+  color: white;
+}
+
+.guardar {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Tabla */
+.contenedor__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table__categories th,
+.table__categories td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table__categories th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.table__categories tr:hover {
+  background-color: #f1f1f1;
+}
+
+.categories__list th,
+.categories__list td {
+  text-align: center;
+}
+
+.categories__list .id,
+.categories__list .code,
+.categories__list .category,
+.categories__list .title,
+.categories__list .thumbnail,
+.categories__list .price,
+.categories__list .stock,
+.categories__list .available,
+.categories__list .edit,
+.categories__list .delete {
+  padding: 10px;
+}
+
+#edit,
+#delete {
+  cursor: pointer;
+  color: #4CAF50;
+}
+
+#edit:hover,
+#delete:hover {
+  color: #f44336;
+}

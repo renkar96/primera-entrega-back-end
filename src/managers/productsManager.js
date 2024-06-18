@@ -1,82 +1,115 @@
-const product = [];
+import fs from 'fs/promises';
+import path from 'path';
 
-export const getAllProducts = (req, res) => {
-    res.json(product);
-};
+const filePath = path.join('./src/fileSystem/productos.json');
 
-export const getProductById = (req, res) => {
-    const { pid } = req.params;
-
-    const foundProduct = product.find((prod) => prod.id === pid);
-
-    if (!foundProduct) {
-        return res.status(404).json({ message: "Producto no encontrado" });
+export default class ProductManager {
+    async readFile() {
+        try {
+            const data = await fs.readFile(filePath, 'utf-8');
+            return JSON.parse(data);
+        } catch (error) {
+            console.error('Error reading file:', error);
+            return [];
+        }
     }
 
-    res.json(foundProduct);
-};
-
-export const createProduct = (req, res) => {
-    const { id, title, description, code, price, status, stock, category, thumbnails } = req.body;
-
-    if (!id || !title || !description || !code || !price || !status || !stock || !category) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    async writeFile(data) {
+        try {
+            await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+        } catch (error) {
+            console.error('Error writing file:', error);
+            throw error;
+        }
     }
 
-    const newProduct = {
-        id,
-        title,
-        description,
-        code,
-        price,
-        status,
-        stock,
-        category,
-        thumbnails
-    };
-
-    product.push(newProduct);
-
-    res.status(200).json(newProduct);
-};
-
-export const updateProduct = (req, res) => {
-    const { pid } = req.params;
-    const { title, description, code, price, status, stock, category, thumbnails } = req.body;
-
-    const productIndex = product.findIndex((prod) => prod.id === pid);
-
-    if (productIndex === -1) {
-        return res.status(404).json({ message: "Producto no encontrado" });
+    generateId(products) {
+        const maxId = products.reduce((max, product) => (product.id > max ? product.id : max), 0);
+        return maxId + 1;
     }
 
-    const updatedProduct = {
-        ...product[productIndex],
-        title: title || product[productIndex].title,
-        description: description || product[productIndex].description,
-        code: code || product[productIndex].code,
-        price: price || product[productIndex].price,
-        status: status || product[productIndex].status,
-        stock: stock || product[productIndex].stock,
-        category: category || product[productIndex].category,
-        thumbnails: thumbnails || product[productIndex].thumbnails
-    };
-
-    product[productIndex] = updatedProduct;
-
-    res.json(updatedProduct);
-};
-
-export const deleteProduct = (req, res) => {
-    const { pid } = req.params;
-
-    const productIndex = product.findIndex((prod) => prod.id === pid);
-
-    if (productIndex === -1) {
-        return res.status(404).json({ message: "Producto no encontrado" });
+    validateCode(products, code) {
+        return !products.some(product => product.code === code);
     }
 
-    product.splice(productIndex, 1);
+    async findProductById(id) {
+        const products = await this.readFile();
+        return products.find(product => product.id === id);
+    }
 
-    res.json({ message: "Producto eliminado" });
-};
+    async getAllProducts() {
+        return await this.readFile();
+    }
+
+    async getProductById(id) {
+        const product = await this.findProductById(id);
+        if (!product) {
+            throw new Error('Producto no encontrado');
+        }
+        return product;
+    }
+
+    async addProduct(productData) {
+        const { category, title, description, price, code, stock, thumbnails, available } = productData;
+        const products = await this.readFile();
+
+        if (!category || !title || !description || !price || !code || !stock) {
+            throw new Error('Todos los campos son obligatorios');
+        }
+
+        if (!this.validateCode(products, code)) {
+            throw new Error('El código ya existe');
+        }
+
+        const newProduct = {
+            id: this.generateId(products),
+            category,
+            title,
+            description,
+            price,
+            code,
+            stock,
+            thumbnails,
+            available: available || false,
+        };
+
+        products.push(newProduct);
+        await this.writeFile(products);
+
+        return newProduct;
+    }
+
+    async updateProduct(updatedProduct) {
+        const products = await this.readFile();
+        const index = products.findIndex(product => product.id === updatedProduct.id);
+
+        if (index === -1) {
+            throw new Error('Producto no encontrado');
+        }
+
+        products[index] = { ...products[index], ...updatedProduct };
+        await this.writeFile(products);
+
+        return products[index];
+    }
+
+    async deleteProduct(id) {
+        let products = await this.readFile();
+        products = products.filter(product => product.id !== id);
+        await this.writeFile(products);
+    }
+
+    async toggleAvailability(id) {
+        const products = await this.readFile();
+        const index = products.findIndex(product => product.id === id);
+
+        if (index === -1) {
+            throw new Error('Producto no encontrado');
+        }
+
+        products[index].available = !products[index].available;
+        await this.writeFile(products);
+
+        return products[index];
+    }
+}

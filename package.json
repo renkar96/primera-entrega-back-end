@@ -8,12 +8,15 @@
     "stop-windows": "taskkill /F /IM node.exe",
     "stop-linux": "killall -9 node",
     "lint": "eslint ./src --fix"
-},
+  },
   "author": "Andres felipe mesa v",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "socket.io": "^4.7.5"
   },
-  "devDependencies": {},
-  "description": ""
+  "devDependencies": {
+    
+  }
 }

@@ -1,22 +1,28 @@
 [
-    {
-        "id": "1",
-        "title": "producto1",
-        "description": "este es el producto1",
-        "code": "P001",
-        "price": "100",
-        "status": "avilable",
-        "stock": "50",
-        "category": "electronica"
-    },
-    {
-        "id": "2",
-        "title": "producto2",
-        "description": "este es el producto2",
-        "code": "P002",
-        "price": "200",
-        "status": "avilable",
-        "stock": "20",
-        "category": "hogar"
-    }
+	{
+		"id": 1,
+		"category": "comida",
+		"title": "pollo mixta",
+		"description": "hamburguesa de res con pollo frito, lechuga, tomate, cebolla, queso y salsa especial",
+		"price": 10000,
+		"thumbnail": [
+			"https://images.pexels.com/photos/1556698/pexels-photo-1556698.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+		],
+		"code": "ABC001",
+		"stock": 10,
+		"available": true
+	},
+	{
+		"id": 2,
+		"category": "bebida",
+		"title": "jugo de naranja",
+		"description": "jugo natural de naranja",
+		"price": 8000,
+		"thumbnail": [
+			"https://images.pexels.com/photos/17612820/pexels-photo-17612820/free-photo-of-comida-resfriado-sano-amor.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+		],
+		"code": "ABC002",
+		"stock": 10,
+		"available": true
+	}
 ]

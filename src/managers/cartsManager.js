@@ -1,68 +1,64 @@
-import fs from "fs";    
+import path from 'path';
+import { readFile, writeFile } from '../utils/fileUtils.js';
+import { generateId } from '../utils/idUtils.js';
+import ProductManager from './ProductsManager.js';
 
+const productManager = new ProductManager();
 
-const cart = [];
-
-export const getAllCarts = (req, res) => {
-    res.json(cart);
-};
-
-export const getCartById = (req, res) => {
-    const cartId = req.params.cid;
-    const existingCart = cart.find(c => c.id === cartId);
-    if (existingCart) {
-        res.json(existingCart.products);
-    } else {
-        res.status(404).json({ error: "No se encontró el carrito" });
+class CartManager {
+    constructor() {
+        this.path = path.join('./src/fileSystem/carrito.json');
     }
-};
 
-export const createCart = (req, res) => {
-    const newCart = {
-        id: `cart-${cart.length + 1}`, // Genera un ID en formato "cart-N"
-        products: req.body.products || [] // Agrega los productos del cuerpo de la solicitud o una matriz vacía si no hay productos
-    };
-    const existingCart = cart.find(c => c.id === newCart.id); // Comprobar si ya existe un carrito con el mismo ID
-    if (existingCart) {
-        res.status(409).json({ error: "El carrito con el mismo ID ya existe" });
-    } else {
-        cart.push(newCart);
-        res.status(201).json(newCart);
+    async findCartById(id) {
+        const carts = await readFile(this.path);
+        return carts.find(cart => cart.id === id);
     }
-};
 
-export const addProductToCart = (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-    const existingCart = cart.find(c => c.id === cartId);
-
-    if (existingCart) {
-        const existingProduct = existingCart.products.find(p => p.product === productId);
-        if (existingProduct) {
-            existingProduct.quantity += 1;
-        } else {
-            existingCart.products.push({ product: productId, quantity: 1 });
-        }
-        res.status(200).json(existingCart);
-    } else {
-        res.status(404).json({ error: "No se encontró el carrito" });
+    async addCart() {
+        const carts = await readFile(this.path);
+        const newCart = { id: generateId(carts), products: [] };
+        carts.push(newCart);
+        await writeFile(this.path, carts);
+        return "Carrito Agregado";
     }
-};
 
-export const getCartsFromFile = (req, res) => {
-    const carritoFilePath = "/path/to/carrito/file.json"; // Reemplazar con la ruta del archivo real
-    fs.readFile(carritoFilePath, "utf8", (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Error al leer el archivo" });
-        }
+    async addProductToCart(cartId, productId) {
         try {
-            const carts = JSON.parse(data);
-            const copiedCarts = [...carts]; // Copia los datos a una nueva variable
-            res.json(copiedCarts);
+            const cart = await this.findCartById(cartId);
+            if (!cart) return "Carrito no encontrado";
+
+            const product = await productManager.getProductById(productId);
+            if (!product) return "Producto no encontrado";
+
+            const carts = await readFile(this.path);
+            const cartIndex = carts.findIndex(cart => cart.id === cartId);
+            const productIndex = carts[cartIndex].products.findIndex(p => p.productId === productId);
+
+            if (productIndex === -1) {
+                carts[cartIndex].products.push({ productId, cantidad: 1 });
+            } else {
+                carts[cartIndex].products[productIndex].cantidad += 1;
+            }
+
+            await writeFile(this.path, carts);
+            return "Producto Agregado al Carrito";
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Error al analizar JSON" });
+            return "Error interno";
         }
-    });
-};
+    }
+
+    async deleteCartById(id) {
+        let carts = await readFile(this.path);
+        carts = carts.filter(cart => cart.id !== id);
+        await writeFile(this.path, carts);
+        return "Carrito Eliminado";
+    }
+
+    async getAllCarts() {
+        return await readFile(this.path);
+    }
+}
+
+export default CartManager;
